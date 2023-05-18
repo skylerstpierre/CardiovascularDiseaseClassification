@@ -5,6 +5,5 @@
 
 `CardioPhenoExtract.py` takes in pre-filtered UK Biobank data and adds a column indicating whether a person has been diagnosed with cardiovascular disease (1) or not (0). Diagnosis is based on ICD10 codes.
 
-`SHAP_DNN_baseline.ipynb` further processes the tabular data, builds a deep neural network baseline (standard Sequential model), and computes the Shapley values of the features.
+`CardiacDiseaseClassifiers_All.ipynb` is the main Jupyter notebook. It further processes the tabular data by splitting it into 12 datasets (3 input groups, 4 output label subsets). It trains an MLP deep learning baseline (standard Sequential model) and an XGBoost model (with hyperparameter tuning) for each of the 12 dataset variants. It contains an evaluation (ROC-AUC) of all 36 resulting models. SHAP feature importance analysis is also performed for the MLP and XGBoost models for the BA dataset (both sexes, any disease).
 
-`XGBOOST_SHAP.ipynb` also processes and takes in the tabuler data, builds and tunes an xgboost model, and computes the Shapley values of the features.
