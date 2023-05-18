@@ -1,4 +1,4 @@
-# CardiovascularDiseaseClassification
+# Cardiovascular Disease Classification
 ## CS230 Deep Learning Project
 
 **Note**: This repository contains only the code, not the data. Researchers can [apply](https://www.ukbiobank.ac.uk/enable-your-research/apply-for-access) to access the UK Biobank to complete health-related research that is in the public interest.
