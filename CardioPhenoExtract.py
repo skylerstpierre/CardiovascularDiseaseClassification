@@ -70,9 +70,9 @@ df['p2443_i2'] = np.where(df['p2443_i2'] == 1, 1, 0)  # diabetes status: yes = 1
 df['p20116_i2'] = np.where((df['p20116_i2'] == 1) | (df['p20116_i2'] == 2), 1, 0)  # smoking status: current/previous = 1, no/prefer not to answer = 0
 
 df.drop(columns=['p41270', 'listICD'], inplace=True)
-df.rename(columns={"p31": "Sex", "p21003_i2": "Age", 'p2443_i2': 'diabetes status', 'p21001_i2': 'BMI',
-                   'p30760_i0': 'HDL', 'p30690_i0': 'cholesterol',
-                   'p20116_i2': 'smoking status', 'p12336_i2': 'Ventricular rate', 'p12338_i2': 'P duration',
+df.rename(columns={"p31": "Sex", "p21003_i2": "Age", 'p2443_i2': 'Diabetes status', 'p21001_i2': 'BMI',
+                   'p30760_i0': 'HDL', 'p30690_i0': 'Cholesterol',
+                   'p20116_i2': 'Smoking status', 'p12336_i2': 'Ventricular rate', 'p12338_i2': 'P duration',
                    'p22334_i2': 'PP interval', 'p22330_i2': 'PQ interval', 'p22338_i2': 'QRS number',
                    'p12340_i2': 'QRS duration', 'p22331_i2': 'QT interval', 'p22332_i2': 'QTC interval',
                    'p22333_i2': 'RR interval', 'p22335_i2': 'P axis', 'p22336_i2': 'R axis', 'p22337_i2': 'T axis',
