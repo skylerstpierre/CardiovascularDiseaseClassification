@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import math
 
-df = pd.read_csv('CardioPhenoLarge.csv')
+df = pd.read_csv('CardioPhenoFraminghamPlus.csv')
 df.fillna('0', inplace=True)
 
 
@@ -66,9 +66,13 @@ df['IschaemicHeartDiseases'] = np.where(df['listICD'].str.contains(pattern), 1,
 pattern = '|'.join(ConductionDisorders)
 df['ConductionDisorders'] = np.where(df['listICD'].str.contains(pattern), 1,
                                      0)  # 1 if in list of disease codes, 0 if healthy
+df['p2443_i2'] = np.where(df['p2443_i2'] == 1, 1, 0)  # diabetes status: yes = 1, don't know/no/prefer not to answer = 0
+df['p20116_i2'] = np.where((df['p20116_i2'] == 1) | (df['p20116_i2'] == 2), 1, 0)  # smoking status: current/previous = 1, no/prefer not to answer = 0
 
 df.drop(columns=['p41270', 'listICD'], inplace=True)
-df.rename(columns={"p31": "Sex", "p21003_i2": "Age", 'p12336_i2': 'Ventricular rate', 'p12338_i2': 'P duration',
+df.rename(columns={"p31": "Sex", "p21003_i2": "Age", 'p2443_i2': 'diabetes status', 'p21001_i2': 'BMI',
+                   'p30760_i0': 'HDL', 'p30690_i0': 'cholesterol',
+                   'p20116_i2': 'smoking status', 'p12336_i2': 'Ventricular rate', 'p12338_i2': 'P duration',
                    'p22334_i2': 'PP interval', 'p22330_i2': 'PQ interval', 'p22338_i2': 'QRS number',
                    'p12340_i2': 'QRS duration', 'p22331_i2': 'QT interval', 'p22332_i2': 'QTC interval',
                    'p22333_i2': 'RR interval', 'p22335_i2': 'P axis', 'p22336_i2': 'R axis', 'p22337_i2': 'T axis',
@@ -82,7 +86,7 @@ df.rename(columns={"p31": "Sex", "p21003_i2": "Age", 'p12336_i2': 'Ventricular r
                    'p4200_i2': 'Position of the shoulder on the pulse waveform', 'p4194_i2': 'Pulse rate',
                    'p21021_i2': 'Pulse wave Arterial Stiffness index', 'p4196_i2': 'Pulse wave peak to peak time',
                    'p4195_i2': 'Pulse wave reflection index', 'p22426_i2': 'Average heart rate',
-                   'p22427_i2': 'Body surface area', 'p22425_i2': 'Cardiac index', 'p22424_i2': 'Cardiac output',
+                   'p22425_i2': 'Cardiac index', 'p22424_i2': 'Cardiac output',
                    'p22420_i2': 'LV ejection fraction', 'p22421_i2': 'LV end diastolic volume',
                    'p22422_i2': 'LV end systolic volume', 'p22423_i2': 'LV stroke volume',
                    '12681avg': 'Augmentation index for PWA', '12680avg': 'Central augmentation pressure during PWA',
@@ -100,4 +104,5 @@ print(df['HeartDisease'].sum())  # total number of ppl in dataset diagnosed with
 print(df.groupby(['Sex']).sum(numeric_only=True))  # number of female (0) and male (1) ppl diagnosed with heart disease
 print(df['Sex'].count())
 print(df['Sex'].sum())
-df.to_csv('HeartDiseaseLarge.csv', index=False)
+df.to_csv('CardioDiseaseFraminghamPlus.csv', index=False)
+df.groupby(['Sex']).sum(numeric_only=True).to_csv('CardioSexCount.csv', index=True)
