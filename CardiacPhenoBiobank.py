@@ -112,3 +112,6 @@ df_pandas.drop(columns=namesDrop, inplace=True)
 
 # save to csv
 df_pandas.to_csv('CardioPhenoFraminghamPlus.csv', index=False)
+
+# %%bash
+# dx upload CardioPhenoFraminghamPlus.csv --dest /
