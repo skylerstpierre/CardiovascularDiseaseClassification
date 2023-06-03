@@ -6,7 +6,6 @@ __pycache__/
 nvvm
 *.db
 *.pkl
-*.png
 *.snapshot
 *.pb
 *.metadata
