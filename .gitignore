@@ -1,5 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
 *.csv
 nvvm
-*.png
 *.db
-*.pdf
+*.pkl
+*.png
+*.snapshot
+*.pb
+*.metadata
