@@ -34,9 +34,9 @@ from aux_functions_xgb import fit_xgb, tune_xgb
 ######################################
 
 
-###########################
-###### XGBoost SHAP #######
-###########################
+###############################
+###### Cross evaluation #######
+###############################
 N_DATASETS = 12
 # Load the 12 tuned XGBoost models (all features) and the corresponding 12 datasets
 print("Loading XGBoost models and datasets...")
@@ -48,81 +48,75 @@ for i in range(N_DATASETS) :
     with open('models_XGB/datasets/dataset' + str(i) + '.pkl', 'rb') as f:
         XY = pickle.load(f)
         XY_xgb.append(XY)
+
+with open('preprocessed_datasets/data_all.pkl', 'rb') as f:
+    features_df, features, targets = pickle.load(f)
 print("Done.")
 
-##### Perform SHAP analysis for 12 datasets and save the figures #####
-print("Running SHAP analysis...")
-# Setup and run the SHAP feature explainer for the tuned XGBoost model [0, 0] (BA variant)
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[0])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[0][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[0][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/BA_tuned.png', dpi = 600)
-plt.clf()
-# Both, Hyp
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[1])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[1][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[1][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/BH_tuned.png', dpi = 600)
-plt.clf()
-# Both, Isch
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[2])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[2][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[2][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/BI_tuned.png', dpi = 600)
-plt.clf()
-# Both, Con
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[3])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[3][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[3][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/BC_tuned.png', dpi = 600)
-plt.clf()
-# Fem, Any
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[4])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[4][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[4][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/FA_tuned.png', dpi = 600)
-plt.clf()
-# Fem, Hyp
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[5])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[5][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[5][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/FH_tuned.png', dpi = 600)
-plt.clf()
-# Fem, Isch
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[6])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[6][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[6][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/FI_tuned.png', dpi = 600)
-plt.clf()
-# Fem, Con
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[7])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[7][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[7][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/FC_tuned.png', dpi = 600)
-plt.clf()
-# Male, Any
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[8])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[8][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[8][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/MA_tuned.png', dpi = 600)
-plt.clf()
-# Male, Hyp
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[9])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[9][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[9][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/MH_tuned.png', dpi = 600)
-plt.clf()
-# Male, Isch
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[10])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[10][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[10][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/MI_tuned.png', dpi = 600)
-plt.clf()
-# Male, Con
-explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[11])
-shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[11][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[11][1], max_display = 10, show = False)
-plt.savefig('figures/SHAP/MC_tuned.png', dpi = 600)
-plt.clf()
+# Contextual row-wise and column-wise index bounds: 
+models_I = len(features) # Row-wise: for the number of sex-specific splits
+models_J = len(targets[0]) # Column-wise: for the number of disease-specific subset splits
+
+# Auxiliary reshaped data structures
+XY_xgb_r = np.reshape(XY_xgb, (models_I, models_J, 4))
+xgb_classifiers_tuned_r = np.reshape(xgb_classifiers_tuned, (models_I, models_J))
+
+##### Perform the cross evaluation for the 12 tuned XGBoost models (all features) #####
+print("Running cross evaluation analysis...")
+fig, ax = plt.subplots(2, models_J, sharex=True, sharey=True, dpi = 160, figsize=(12, 8.5))
+c = plt.rcParams['axes.prop_cycle'].by_key()['color'][0:2]
+for j in range(models_J) :
+    # Female data, female model
+    x_test_xgb = XY_xgb_r[1, j][1]
+    y_true_xgb = XY_xgb_r[1, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[1, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
+    ax[0, j].plot(fpr, tpr)
+    ax[0, j].text(0.25, 0.15, f'FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 12, color = c[1]) # AUC metric
+
+    # Female data, male model
+    x_test_xgb = XY_xgb_r[1, j][1]
+    y_true_xgb = XY_xgb_r[1, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[2, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
+    ax[0, j].plot(fpr, tpr)
+    ax[0, j].text(0.25, 0.05, f'MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 12, color = c[0]) # AUC metric
+
+    # Male data, female model
+    x_test_xgb = XY_xgb_r[2, j][1]
+    y_true_xgb = XY_xgb_r[2, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[1, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
+    ax[1, j].plot(fpr, tpr)
+    ax[1, j].text(0.25, 0.15, f'FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 12, color = c[1]) # AUC metric
+
+    # Male data, male model
+    x_test_xgb = XY_xgb_r[2, j][1]
+    y_true_xgb = XY_xgb_r[2, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[2, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
+    ax[1, j].plot(fpr, tpr)
+    ax[1, j].text(0.25, 0.05, f'MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 12, color = c[0]) # AUC metric
+
+    # Formatting
+    ax[0, j].plot(np.linspace(0, 1, 100), np.linspace(0,1,100),'--r')
+    ax[1, j].plot(np.linspace(0, 1, 100), np.linspace(0,1,100),'--r')
+    ax[0, j].set_xlabel('Female Data FPR', fontsize = 12)
+    ax[1, j].set_xlabel('Male Data FPR', fontsize = 12)
+    ax[0, j].set_ylabel(('Female Data TPR' if j == 0 else ''), fontsize = 12)
+    ax[1, j].set_ylabel(('Male Data TPR' if j == 0 else ''), fontsize = 12)
+    ax[0, j].set(ylim = [0., 1.])
+    ax[1, j].set(ylim = [0., 1.])
+    ax[0, j].set_aspect('equal', 'box')
+    ax[1, j].set_aspect('equal', 'box')
+
+fig.tight_layout()
 print("Done.")
 
+print("Saving figure...")
+fig.savefig("figures/Cross_Evaluation/cross_evaluation.png", dpi = 600)
+print("Done.")
