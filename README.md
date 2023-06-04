@@ -7,6 +7,8 @@
 We used the UK Biobank data to train sex-specific classifiers of cardiovascular disease. Three different model types were evaluated: MLP (baseline), XGBoost, and SAINT. The SAINT implementation is adapted from the article [SAINT: Improved Neural Networks for Tabular Data via Row Attention and Contrastive Pre-Training](https://arxiv.org/abs/2106.01342) with the corresponding repository: [Saint GitHub](https://github.com/somepago/saint).
 
 We implemented the following scripts:
+- `CardioPhenoBiobank.py`
+- `CardioPhenoExtract.py`
 - `preprocess_datasets.py`
 - `train_mlp_models.py`
 - `train_xgb_models.py`
@@ -43,16 +45,35 @@ conda env create -f environment.yml
 
 `build_saint_datasets.py`
 
+`aux_functions_data.py`
+
 ## Classifier training
 ### MLP training
 
+`train_mlp_models.py`
+
+`aux_functions_mlp.py`
+
 ### XGBoost training
+
+`train_xgb_models.py`
+
+`aux_functions_xgb.py`
 
 ### SAINT training
 
+`SAINT/train_robust.py`
+
+`SAINT/data_openml.py`
+
 ## Classifier evaluation
+
+`evaluate_all.py`
 
 ## SHAP analysis
 
+`shap_analysis.py`
+
 ## Classifier cross-evaluation
 
+`cross_evaluation.py`
