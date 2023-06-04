@@ -88,7 +88,7 @@ models_saint = []
 testloaders = []
 vision_dsets = []
 XY_saint = []
-for i in range(1, 2) :
+for i in range(0, 2) :
     with open('bestmodels_saint/binary/ds_saint' + str(i) + '.pkl/testrun/properties.pkl', 'rb') as f:
         p = pickle.load(f)
     print(p)
@@ -118,7 +118,7 @@ print("Done.")
 # TEST #
 device = torch.device("cpu")
 
-model = models_saint[0]
+model = models_saint[1]
 model.eval()
 m = torch.nn.Softmax(dim=1)
 y_test = torch.empty(0).to(device)
