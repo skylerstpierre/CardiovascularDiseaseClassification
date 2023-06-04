@@ -66,41 +66,75 @@ print("Running cross evaluation analysis...")
 fig, ax = plt.subplots(2, models_J, sharex=True, sharey=True, dpi = 160, figsize=(12, 6))
 c = plt.rcParams['axes.prop_cycle'].by_key()['color'][0:2]
 for j in range(models_J) :
+    # Female data, both model
+    x_test_xgb = XY_xgb_r[1, j][1]
+    x_test_xgb['Sex'] = 0  # 0 is female
+    cols = x_test_xgb.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    x_test_xgb = x_test_xgb[cols]
+    y_true_xgb = XY_xgb_r[1, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[0, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[0, j].plot(fpr, tpr, color=c[0])
+    ax[0, j].text(0.3, 0.17, f'AUC BothXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[0])  # AUC metric
+
     # Female data, female model
     x_test_xgb = XY_xgb_r[1, j][1]
+    x_test_xgb.drop(columns=['Sex'], inplace=True)
     y_true_xgb = XY_xgb_r[1, j][3]
     xgb_cl_tuned = xgb_classifiers_tuned_r[1, j]
-    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
-    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
-    ax[0, j].plot(fpr, tpr)
-    ax[0, j].text(0.23, 0.13, f'AUC FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 11, color = c[0]) # AUC metric
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[0, j].plot(fpr, tpr, color=c[1])
+    ax[0, j].text(0.3, 0.1, f'AUC FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[1])  # AUC metric
 
     # Female data, male model
     x_test_xgb = XY_xgb_r[1, j][1]
     y_true_xgb = XY_xgb_r[1, j][3]
     xgb_cl_tuned = xgb_classifiers_tuned_r[2, j]
-    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
-    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
-    ax[0, j].plot(fpr, tpr)
-    ax[0, j].text(0.23, 0.03, f'AUC MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 11, color = c[1]) # AUC metric
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[0, j].plot(fpr, tpr, color=c[2])
+    ax[0, j].text(0.3, 0.03, f'AUC MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[2])  # AUC metric
+
+    # Male data, both model
+    x_test_xgb = XY_xgb_r[2, j][1]
+    x_test_xgb['Sex'] = 1  # 1 is male
+    cols = x_test_xgb.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    x_test_xgb = x_test_xgb[cols]
+    y_true_xgb = XY_xgb_r[2, j][3]
+    xgb_cl_tuned = xgb_classifiers_tuned_r[0, j]
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[1, j].plot(fpr, tpr, color=c[0])
+    ax[1, j].text(0.3, 0.17, f'AUC BothXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[0])  # AUC metric
 
     # Male data, female model
     x_test_xgb = XY_xgb_r[2, j][1]
+    x_test_xgb.drop(columns=['Sex'], inplace=True)
     y_true_xgb = XY_xgb_r[2, j][3]
     xgb_cl_tuned = xgb_classifiers_tuned_r[1, j]
-    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
-    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
-    ax[1, j].plot(fpr, tpr)
-    ax[1, j].text(0.23, 0.13, f'AUC FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 11, color = c[0]) # AUC metric
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[1, j].plot(fpr, tpr, color=c[1])
+    ax[1, j].text(0.3, 0.1, f'AUC FemXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[1])  # AUC metric
 
     # Male data, male model
     x_test_xgb = XY_xgb_r[2, j][1]
     y_true_xgb = XY_xgb_r[2, j][3]
     xgb_cl_tuned = xgb_classifiers_tuned_r[2, j]
-    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
-    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
-    ax[1, j].plot(fpr, tpr)
-    ax[1, j].text(0.23, 0.03, f'AUC MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 11, color = c[1]) # AUC metric
+    y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb)  # XGB test set predictions
+    fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:, 1])  # ROC curve
+    ax[1, j].plot(fpr, tpr, color=c[2])
+    ax[1, j].text(0.3, 0.03, f'AUC MaleXGB = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:, 1]):.3f}', fontsize=10,
+                  color=c[2])  # AUC metric
 
     # Formatting
     ax[0, j].plot(np.linspace(0, 1, 100), np.linspace(0,1,100),'--k')
