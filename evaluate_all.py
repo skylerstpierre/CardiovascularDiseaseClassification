@@ -88,10 +88,9 @@ models_saint = []
 testloaders = []
 vision_dsets = []
 XY_saint = []
-for i in range(0, 2) :
+for i in range(N_DATASETS) :
     with open('bestmodels_saint/binary/ds_saint' + str(i) + '.pkl/testrun/properties.pkl', 'rb') as f:
         p = pickle.load(f)
-    print(p)
     model = SAINT(categories = p[0][0], 
                     num_continuous = p[0][1],                
                     dim = p[0][2],                           
@@ -114,57 +113,6 @@ for i in range(0, 2) :
         XY = pickle.load(f)
         XY_saint.append(XY)
 print("Done.")
-
-# TEST #
-device = torch.device("cpu")
-
-model = models_saint[1]
-model.eval()
-m = torch.nn.Softmax(dim=1)
-y_test = torch.empty(0).to(device)
-y_pred = torch.empty(0).to(device)
-prob = torch.empty(0).to(device)
-with torch.no_grad():
-    for i, data in enumerate(testloaders[0], 0):
-        x_categ, x_cont, y_gts, cat_mask, con_mask = data[0].to(device), data[1].to(device),data[2].to(device),data[3].to(device),data[4].to(device)
-        _ , x_categ_enc, x_cont_enc = embed_data_mask(x_categ, x_cont, cat_mask, con_mask,model, vision_dsets[0])           
-        reps = model.transformer(x_categ_enc, x_cont_enc)
-        y_reps = reps[:,0,:]
-        y_outs = model.mlpfory(y_reps)
-        # import ipdb; ipdb.set_trace()   
-        y_test = torch.cat([y_test,y_gts.squeeze().float()],dim=0)
-        y_pred = torch.cat([y_pred,torch.argmax(y_outs, dim=1).float()],dim=0)
-        prob = torch.cat([prob,m(y_outs)[:,-1].float()],dim=0)
-
-print(y_test)
-print(y_pred)
-print(prob)
-
-fpr, tpr, thresholds = roc_curve(y_test, prob)
-
-print("Plotting the ROC curves...")
-
-plt.plot(fpr, tpr)
-
-# Formatting
-# ax[i, j].plot(np.linspace(0,1, 100), np.linspace(0,1,100),'--r')
-# ax[i, j].set_xlabel(('FPR' if i == 2 else ''), fontsize = 12)
-# ax[i, j].set_ylabel(('TPR' if j == 0 else ''), fontsize = 12)
-# ax[i, j].set(ylim = [0., 1.])
-# ax[i, j].set_aspect('equal', 'box')
-# ax[i, j].text(0.5, 0.2, f'AUC = {roc_auc_score(y_true_xgb, y_pred_xgb[:,1]):.3f}', fontsize = 12) # AUC metric
-        
-print("Done.")
-
-# Save fig.
-print("Saving figure...")
-plt.savefig("figures/saint_test.png", dpi = 600)
-print("Done.")
-print("Done evaluating SAINT.")
-
-# with torch.no_grad():
-#     models_saint[0].eval()
-#     print(models_saint[0](XY_saint[0][2]))
 
 ##################################
 ###### Evaluate all models #######
@@ -254,7 +202,7 @@ fig.savefig("figures/ROC_XGB_Untuned.png", dpi = 600)
 print("Done.")
 print("Done evaluating XGBoost (untuned).")
 
-## Tntuned ##
+## Tuned ##
 print("Evaluating XGBoost models (tuned)...")
 
 # Reshape the comprehensive XGBoost model collection 
@@ -309,7 +257,69 @@ print("Done evaluating XGBoost (tuned).")
 ##################
 ## SAINT models ##
 ##################
+print("Evaluating SAINT models...")
+device = torch.device("cpu")
 
+print("Computing predictions and extracting ground truth on the test set...")
+y_test_saint = [[0 for x in range(models_J)] for x in range(models_I)]
+y_pred_saint = [[0 for x in range(models_J)] for x in range(models_I)]
+prob_saint = [[0 for x in range(models_J)] for x in range(models_I)]
+for model_index in range(len(models_saint)) :
+    model = models_saint[model_index]
+    index2d = np.unravel_index(model_index, (models_I, models_J))
+
+    ################################################################################################################
+    ### SAINT test set evaluation modified from the classification_scores function in utils.py (from SAINT repo) ###
+    model.eval()
+    m = torch.nn.Softmax(dim=1)
+    # y_test = torch.empty(0).to(device)
+    # y_pred = torch.empty(0).to(device)
+    # prob = torch.empty(0).to(device)
+    with torch.no_grad():
+        y_test_i = torch.empty(0).to(device)
+        y_pred_i = torch.empty(0).to(device)
+        prob_i = torch.empty(0).to(device)
+        for i, data in enumerate(testloaders[model_index], 0):
+            x_categ, x_cont, y_gts, cat_mask, con_mask = data[0].to(device), data[1].to(device),data[2].to(device),data[3].to(device),data[4].to(device)
+            _ , x_categ_enc, x_cont_enc = embed_data_mask(x_categ, x_cont, cat_mask, con_mask,model, vision_dsets[model_index])           
+            reps = model.transformer(x_categ_enc, x_cont_enc)
+            y_reps = reps[:,0,:]
+            y_outs = model.mlpfory(y_reps)
+            # import ipdb; ipdb.set_trace()   
+            y_test_i = torch.cat([y_test_i,y_gts.squeeze().float()],dim=0)
+            y_pred_i = torch.cat([y_pred_i,torch.argmax(y_outs, dim=1).float()],dim=0)
+            prob_i = torch.cat([prob_i,m(y_outs)[:,-1].float()],dim=0)
+        y_test_saint[index2d[0]][index2d[1]] = y_test_i
+        y_pred_saint[index2d[0]][index2d[1]] = y_pred_i
+        prob_saint[index2d[0]][index2d[1]] = prob_i
+    ################################################################################################################
+print("Done.")
+
+# Plot the ROC curve and report the AUC metric for all 12 SAINT models
+print("Plotting the ROC curves...")
+fig, ax = plt.subplots(models_I, models_J, sharex=True, sharey=True, dpi = 160, figsize=(12, 8.5))
+for i in range(models_I) :
+    for j in range(models_J) :
+        # ROC curve
+        fpr, tpr, thresholds = roc_curve(y_test_saint[i][j], prob_saint[i][j])
+        ax[i, j].plot(fpr, tpr)
+        
+        # Formatting
+        ax[i, j].plot(np.linspace(0,1, 100), np.linspace(0,1,100),'--r')
+        ax[i, j].set_xlabel(('FPR' if i == 2 else ''), fontsize = 12)
+        ax[i, j].set_ylabel(('TPR' if j == 0 else ''), fontsize = 12)
+        ax[i, j].set(ylim = [0., 1.])
+        ax[i, j].set_aspect('equal', 'box')
+        ax[i, j].text(0.5, 0.2, f'AUC = {roc_auc_score(y_test_saint[i][j], prob_saint[i][j]):.3f}', fontsize = 12) # AUC metric
+        
+fig.tight_layout()
+print("Done.")
+
+# Save fig.
+print("Saving figure...")
+plt.savefig("figures/ROC_SAINT.png", dpi = 600)
+print("Done.")
+print("Done evaluating SAINT.")
 
 ##############################
 ## All models in one figure ##
@@ -317,6 +327,7 @@ print("Done evaluating XGBoost (tuned).")
 print("Plotting the ROC curves for all 60 models in one figure...")
 fig, ax = plt.subplots(models_I, models_J, sharex=True, sharey=True, dpi = 160, figsize=(12, 8.5))
 fig.tight_layout()
+c = plt.rcParams['axes.prop_cycle'].by_key()['color'][0:5]
 for i in range(models_I) :
     for j in range(models_J) :
         # Baseline MLPs
@@ -336,7 +347,11 @@ for i in range(models_I) :
         y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
         fpr, tpr, thresholds = roc_curve(y_true_xgb, y_pred_xgb_tuned[:,1]) # ROC curve
         ax[i, j].plot(fpr, tpr)
-        
+
+        # SAINT
+        fpr, tpr, thresholds = roc_curve(y_test_saint[i][j], prob_saint[i][j])
+        ax[i, j].plot(fpr, tpr)
+
         # XGBoost (Tuned, Framingham Only)
         xgb_cl_tunedF = xgb_classifiers_tuned_rF[i, j]
         x_test_xgbF = XY_xgb_rF[i, j][1]
@@ -346,16 +361,16 @@ for i in range(models_I) :
         ax[i, j].plot(fpr, tpr)
         
         # Formatting
-        ax[i, j].plot(np.linspace(0, 1, 100), np.linspace(0,1,100),'--r')
+        ax[i, j].plot(np.linspace(0, 1, 100), np.linspace(0,1,100),'--k')
         ax[i, j].set_xlabel(('FPR' if i == 2 else ''), fontsize = 12)
         ax[i, j].set_ylabel(('TPR' if j == 0 else ''), fontsize = 12)
         ax[i, j].set(ylim = [0., 1.])
         ax[i, j].set_aspect('equal', 'box')
-        c = plt.rcParams['axes.prop_cycle'].by_key()['color'][0:3]
-        ax[i, j].text(0.35, 0.31, f'AUC MLP = {roc_auc_score(y_true[i, j], y_pred[i, j]):.3f}', fontsize = 12, color = c[0]) # AUC metric
-        ax[i, j].text(0.35, 0.24, f'AUC XGBu = {roc_auc_score(y_true_xgb, y_pred_xgb[:,1]):.3f}', fontsize = 12, color = c[1]) # AUC metric
-        ax[i, j].text(0.35, 0.17, f'AUC XGBt = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 12, color = c[2]) # AUC metric
-        ax[i, j].text(0.35, 0.1, f'AUC XGB Fram = {roc_auc_score(y_true_xgbF, y_pred_xgb_tunedF[:,1]):.3f}', fontsize = 12, color = c[2]) # AUC metric
+        ax[i, j].text(0.34, 0.30, f'AUC MLP = {roc_auc_score(y_true[i, j], y_pred[i, j]):.3f}', fontsize = 10, color = c[0]) # AUC metric
+        ax[i, j].text(0.34, 0.23, f'AUC XGBu = {roc_auc_score(y_true_xgb, y_pred_xgb[:,1]):.3f}', fontsize = 10, color = c[1]) # AUC metric
+        ax[i, j].text(0.34, 0.16, f'AUC XGBt = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 10, color = c[2]) # AUC metric
+        ax[i, j].text(0.34, 0.09, f'AUC SAINT = {roc_auc_score(y_test_saint[i][j], prob_saint[i][j]):.3f}', fontsize = 10, color = c[3]) # AUC metric
+        ax[i, j].text(0.34, 0.02, f'AUC XGB Fram = {roc_auc_score(y_true_xgbF, y_pred_xgb_tunedF[:,1]):.3f}', fontsize = 10, color = c[4]) # AUC metric
         ax[i, j].set(xlabel = ('FPR' if i == 2 else ''), ylabel = ('TPR' if j == 0 else ''), ylim = [0., 1.])
 
 fig.tight_layout()
