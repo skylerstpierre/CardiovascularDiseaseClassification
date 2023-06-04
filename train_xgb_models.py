@@ -48,7 +48,7 @@ with open('preprocessed_datasets/data_F.pkl', 'rb') as f:
 print("Done.")
 
 # Train-test split for XGBoost
-TEST_SIZE = 0.2 # Changed to 0.2 for consistency
+TEST_SIZE = 0.15 # Changed to 0.2 for consistency
 print("Initializing XGBoost datasets...")
 XY_xgb = [train_test_split(features_df[i], Y, test_size = TEST_SIZE, shuffle = False) for i in range(len(features_df)) for Y in targets[i]]
 XY_xgbF = [train_test_split(features_dfF[i], Y, test_size = TEST_SIZE, shuffle = False) for i in range(len(features_dfF)) for Y in targetsF[i]]
@@ -90,12 +90,12 @@ params = {'max_depth': [1, 3, 5, 6, 10, 15, 20],
 
 # Perform the XGBoost tuning for all 12 dataset variants; Set n_jobs to the number of desired processes
 print("Tuning the 12 XGBoost models for all features...")
-xgb_classifiers_tuned = Parallel(n_jobs = 16)(delayed(tune_xgb)(XY_xgb[i][0], XY_xgb[i][2], params) for i in range(len(XY_xgb)))
+xgb_classifiers_tuned = Parallel(n_jobs = 12)(delayed(tune_xgb)(XY_xgb[i][0], XY_xgb[i][2], params) for i in range(len(XY_xgb)))
 print("Done.")
 
 # Perform the XGBoost tuning on Framingham Only for all 12 dataset variants; Set n_jobs to the number of desired processes
 print("Tuning the 12 XGBoost models for Framingham only...")
-xgb_classifiers_tunedF = Parallel(n_jobs = 16)(delayed(tune_xgb)(XY_xgbF[i][0], XY_xgbF[i][2], params) for i in range(len(XY_xgbF)))
+xgb_classifiers_tunedF = Parallel(n_jobs = 12)(delayed(tune_xgb)(XY_xgbF[i][0], XY_xgbF[i][2], params) for i in range(len(XY_xgbF)))
 print("Done.")
 print("Done tuning.")
 
@@ -105,7 +105,7 @@ for i in range(len(XY_xgb)):
     xgb_classifiers[i].save_model("models_XGB/untuned/model" + str(i) + ".json")
     xgb_classifiersF[i].save_model("models_XGB_Fram/untuned/model" + str(i) + ".json")
 
-    # xgb_classifiers_tuned[i].save_model("models_XGB/tuned/model" + str(i) + ".json")
-    # xgb_classifiers_tunedF[i].save_model("models_XGB_Fram/tuned/model" + str(i) + ".json")
+    xgb_classifiers_tuned[i].save_model("models_XGB/tuned/model" + str(i) + ".json")
+    xgb_classifiers_tunedF[i].save_model("models_XGB_Fram/tuned/model" + str(i) + ".json")
 print("Done.")
 

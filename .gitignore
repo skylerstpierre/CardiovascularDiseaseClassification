@@ -9,3 +9,5 @@ nvvm
 *.snapshot
 *.pb
 *.metadata
+*.sh
+*.bak

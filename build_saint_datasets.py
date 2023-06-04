@@ -46,7 +46,7 @@ print("Done.")
 
 # Split the SAINT dataset into train-dev-test with the same test set as MLP and XGBoost
 print("Building SAINT datasets...")
-TEST_SIZE = 0.2
+TEST_SIZE = 0.15
 XY_saint = [train_test_split(features_df[i], Y, test_size = TEST_SIZE, shuffle = False) for i in range(len(features_df)) for Y in targets[i]]
 for i in range(len(XY_saint)) :
     temp = train_test_split(XY_saint[i][0], XY_saint[i][2], test_size = TEST_SIZE / (1 - TEST_SIZE), shuffle = False) # Split 50-50 for dev and test sets

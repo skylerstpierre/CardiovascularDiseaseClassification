@@ -43,8 +43,8 @@ with open('preprocessed_datasets/data_all.pkl', 'rb') as f:
 print("Done.")
 
 # Build 12 MLP models
-TEST_SIZE = 0.2 # Test size defined here for consistency later in SHAP; note: val size = test size
-MAX_EPOCHS = 2 # 100
+TEST_SIZE = 0.15 # Test size defined here for consistency later in SHAP; note: val size = test size
+MAX_EPOCHS = 100 # 100
 print("Initializing MLP models...")
 models_mlp = [build_baseline_MLP(features[i], Y, valtest_frac = TEST_SIZE * 2, max_epochs = MAX_EPOCHS, oversample = True) for i in range(len(features)) for Y in targets[i]]
 

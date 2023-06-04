@@ -55,7 +55,7 @@ print("Running SHAP analysis...")
 # Setup and run the SHAP feature explainer for the tuned XGBoost model [0, 0] (BA variant)
 explainer_xgbu_tuned = shap.TreeExplainer(xgb_classifiers_tuned[0])
 shap_values_xgbu_tuned = explainer_xgbu_tuned.shap_values(XY_xgb[0][1])
-shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[0][1], max_display = 10, show = False)
+shap.summary_plot(shap_values_xgbu_tuned, XY_xgb[0][1], max_display = 10, show = False, plot_size = (11.0, 6.0))
 plt.savefig('figures/SHAP/BA_tuned.png', dpi = 600)
 plt.clf()
 # Both, Hyp

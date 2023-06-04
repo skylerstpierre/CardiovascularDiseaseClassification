@@ -210,7 +210,7 @@ elif opt.optimizer == 'Adam':
     optimizer = optim.Adam(model.parameters(),lr=opt.lr)
 elif opt.optimizer == 'AdamW':
     # optimizer = optim.AdamW(model.parameters(),lr=opt.lr)
-    optimizer = optim.AdamW(model.parameters(),lr=opt.lr, weight_decay = 8.) # 4.0
+    optimizer = optim.AdamW(model.parameters(),lr=opt.lr, weight_decay = 10.) # 4.0
 best_valid_auroc = 0
 best_valid_accuracy = 0
 best_test_auroc = 0
