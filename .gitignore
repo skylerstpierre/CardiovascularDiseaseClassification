@@ -11,3 +11,5 @@ nvvm
 *.metadata
 *.sh
 *.bak
+
+!bestmodels_saint/**
