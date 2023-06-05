@@ -370,7 +370,7 @@ for i in range(models_I) :
         ax[i, j].text(0.34, 0.23, f'AUC XGBu = {roc_auc_score(y_true_xgb, y_pred_xgb[:,1]):.3f}', fontsize = 10, color = c[1]) # AUC metric
         ax[i, j].text(0.34, 0.16, f'AUC XGBt = {roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1]):.3f}', fontsize = 10, color = c[2]) # AUC metric
         ax[i, j].text(0.34, 0.09, f'AUC SAINT = {roc_auc_score(y_test_saint[i][j], prob_saint[i][j]):.3f}', fontsize = 10, color = c[3]) # AUC metric
-        ax[i, j].text(0.34, 0.02, f'AUC XGB Fram = {roc_auc_score(y_true_xgbF, y_pred_xgb_tunedF[:,1]):.3f}', fontsize = 10, color = c[4]) # AUC metric
+        ax[i, j].text(0.34, 0.02, f'AUC XGBtFram = {roc_auc_score(y_true_xgbF, y_pred_xgb_tunedF[:,1]):.3f}', fontsize = 10, color = c[4]) # AUC metric
         ax[i, j].set(xlabel = ('FPR' if i == 2 else ''), ylabel = ('TPR' if j == 0 else ''), ylim = [0., 1.])
 
 fig.tight_layout()
