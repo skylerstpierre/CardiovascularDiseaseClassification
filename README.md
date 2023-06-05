@@ -33,6 +33,8 @@ We provide an `environment.yml` file for use with `miniconda` or `anaconda`. You
 conda env create -f environment.yml
 ```
 
+The code was executed on Ubuntu 22.04.2 LTS using the conda environment defined by `environment.yml`.
+
 ## Data preparation
 
 `CardioPhenoBiobank.py` extracts the cardiovascular features and disease diagnoses we selected from the entire UK Biobank database. Spark SQL is used to gather the features and then after converting to a Pandas dataframe we remove missing values and consolidate any arrayed features into one column, e.g. taking the mean of four consecutive blood pressure measurements.
@@ -97,8 +99,8 @@ The **Dataset pre-processing** scripts have to be executed first. Includes an ov
 
 ## SHAP analysis
 
-`shap_analysis.py`
+`shap_analysis.py` runs a SHAP analysis of feature importance for the 12 tuned XGBoost models with all input features. Generates the corresponding 12 SHAP summary figures.
 
 ## Classifier cross-evaluation
 
-`cross_evaluation.py`
+`cross_evaluation.py` performs a cross-evaluation AUC-ROC performance analysis in which the XGBoost models trained on one dataset are evaluated on test sets from other datasets. For example, the model trained on the BA dataset (both sexes, any disease) is cross-evaluated on the FA test set (female only, any disease).
