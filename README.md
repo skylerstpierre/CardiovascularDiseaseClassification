@@ -41,34 +41,59 @@ conda env create -f environment.yml
 
 ## Dataset pre-processing
 
-`preprocess_datasets.py`
+`preprocess_datasets.py` preprocesses the datasets with the following steps: 
+- Shuffle the overall dataset for randomness. Shuffling at the pre-processing stage (instead of on a per-model basis) guarantees that every model will be evaluated on the same test set, regardless of the differences in the utilized dataset pipeline.
+- Extract the 12 different datasets:
+  - Both sexes, Any disease
+  - Both sexes, Hypertension
+  - Both sexes, Ischemic disease
+  - Both sexes, Conduction disorder
+  - Female only, Any disease
+  - Female only, Hypertension
+  - Female only, Ischemic disease
+  - Female only, Conduction disorder
+  - Male only, Any disease
+  - Male only, Hypertension
+  - Male only, Ischemic disease
+  - Male only, Conduction disorder.
+- Build iterable dataset collections for streamlined training, hyperparameter tuning, and performance evaluation.
+- Pickle the data sets
 
-`build_saint_datasets.py`
+`build_saint_datasets.py` builds and saves the datasets in a format that is readily accessible for the SAINT input pipeline. Performs train-val-test splits and applies oversampling to the training set before exporting the datasets.
 
-`aux_functions_data.py`
+`aux_functions_data.py` implements a library of auxiliary functions for data processing, training set oversampling, and export. 
 
 ## Classifier training
 ### MLP training
 
-`train_mlp_models.py`
+`train_mlp_models.py` performs the following steps:
+- Builds the MLP baseline models
+- Trains the MLP baseline models
+- Saves the MLP baseline models
+The **Dataset pre-processing** scripts have to be executed first. Includes an oversampling step for the training set data.
 
-`aux_functions_mlp.py`
+`aux_functions_mlp.py` implements a library of auxiliary functions for building the MLP models. 
 
 ### XGBoost training
 
-`train_xgb_models.py`
+`train_xgb_models.py` performs the following steps:
+- Initializes the XGBoost ensembles
+- Trains the XGBoost ensembles
+- Performs random-search hyperparameter tuning for each XGBoost ensemble. The implementation is parallelized on the CPU.
+- Saves both the untuned and the tuned XGBoost ensembles.
+The **Dataset pre-processing** scripts have to be executed first. Includes an oversampling step for the training set data.
 
-`aux_functions_xgb.py`
+`aux_functions_xgb.py` implements a library of auxiliary functions for training and tuning the XGBoost ensembles.
 
 ### SAINT training
 
-`SAINT/train_robust.py`
+`SAINT/train_robust.py` trains the SAINT model given a pickled dataset (using `build_saint_datasets.py`) using contrastive pretraining and intersample attention. This function is modified from the [Saint repository](https://github.com/somepago/saint).
 
-`SAINT/data_openml.py`
+`SAINT/data_openml.py` implements a library of auxiliary functions for importing the dataset for SAINT training. It was adapted from the [Saint repository](https://github.com/somepago/saint) to allow pickled dataset input, as opposed to OpenML datasets only in the original implementation. 
 
 ## Classifier evaluation
 
-`evaluate_all.py`
+`evaluate_all.py` performs a comprehensive evaluation of all 60 classifiers on the corresponding 12 test sets. Generates ROC curves and computes the AUC metric for all 60 classifiers.  
 
 ## SHAP analysis
 
