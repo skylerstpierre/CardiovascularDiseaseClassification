@@ -35,6 +35,13 @@ conda env create -f environment.yml
 
 The code was executed on Ubuntu 22.04.2 LTS using the conda environment defined by `environment.yml`.
 
+## Provided model weights
+We provide the model weights obtained for all 60 trained classifiers:
+- directory `models_MLP` contains trained MLP model weights
+- directory `models_XGB` contains trained XGBoost (both untuned and tuned) ensembles
+- directory `models_XGB_Fram` contains XGBoost ensembles trained and tuned on Framingham-score features only
+- directory `bestmodels_saint` contains trained SAINT model weights
+
 ## Data preparation
 
 `CardioPhenoBiobank.py` extracts the cardiovascular features and disease diagnoses we selected from the entire UK Biobank database. Spark SQL is used to gather the features and then after converting to a Pandas dataframe we remove missing values and consolidate any arrayed features into one column, e.g. taking the mean of four consecutive blood pressure measurements.
