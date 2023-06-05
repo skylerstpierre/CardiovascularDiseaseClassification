@@ -19,7 +19,7 @@ import xgboost as xgb
 # import shap
 import torch
 from joblib import Parallel, delayed
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -379,4 +379,80 @@ print("Done.")
 # Save fig.
 print("Saving figure...")
 fig.savefig("figures/ROC_Comparison.png", dpi = 600)
+print("Done.")
+
+#################################################
+## Different evaluation metrics for all models ##
+#################################################
+# Helper function to convert output probabilities to labels 
+def prob_to_labels(y_pred) :
+    y_label = np.copy(y_pred)
+    y_label[y_label> 0.5] = 1
+    y_label[y_label <= 0.5] = 0
+    return y_label
+
+print("Computing all evaluation metrics...")
+acc = [[0 for x in range(5)] for x in range(N_DATASETS)]
+prec = [[0 for x in range(5)] for x in range(N_DATASETS)]
+rec = [[0 for x in range(5)] for x in range(N_DATASETS)]
+auc = [[0 for x in range(5)] for x in range(N_DATASETS)]
+for i in range(models_I) :
+    for j in range(models_J) :
+        # Baseline MLPs
+        y_pred_labels_mlp = prob_to_labels(y_pred[i, j])
+        acc_mlp = accuracy_score(y_true[i, j], y_pred_labels_mlp)
+        prec_mlp = precision_score(y_true[i, j], y_pred_labels_mlp)
+        rec_mlp = recall_score(y_true[i, j], y_pred_labels_mlp)
+        auc_mlp = roc_auc_score(y_true[i, j], y_pred[i, j])
+        
+        # XGBoost (Untuned)
+        xgb_cl = xgb_classifiers_r[i, j]
+        x_test_xgb = XY_xgb_r[i, j][1]
+        y_true_xgb = XY_xgb_r[i, j][3]
+        y_pred_xgb = xgb_cl.predict_proba(x_test_xgb) # XGB test set predictions
+        y_pred_labels_xgbu = prob_to_labels(y_pred_xgb[:,1])
+        acc_xgbu = accuracy_score(y_true_xgb, y_pred_labels_xgbu)
+        prec_xgbu = precision_score(y_true_xgb, y_pred_labels_xgbu)
+        rec_xgbu = recall_score(y_true_xgb, y_pred_labels_xgbu)
+        auc_xgbu = roc_auc_score(y_true_xgb, y_pred_xgb[:,1])
+        
+        # XGBoost (Tuned)
+        xgb_cl_tuned = xgb_classifiers_tuned_r[i, j]
+        y_pred_xgb_tuned = xgb_cl_tuned.predict_proba(x_test_xgb) # XGB test set predictions
+        y_pred_labels_xgbt = prob_to_labels(y_pred_xgb_tuned[:,1])
+        acc_xgbt = accuracy_score(y_true_xgb, y_pred_labels_xgbt)
+        prec_xgbt = precision_score(y_true_xgb, y_pred_labels_xgbt)
+        rec_xgbt = recall_score(y_true_xgb, y_pred_labels_xgbt)
+        auc_xgbt = roc_auc_score(y_true_xgb, y_pred_xgb_tuned[:,1])
+
+        # SAINT
+        y_pred_labels_saint = prob_to_labels(prob_saint[i][j])
+        acc_saint = accuracy_score(y_test_saint[i][j], y_pred_labels_saint)
+        prec_saint = precision_score(y_test_saint[i][j], y_pred_labels_saint)
+        rec_saint = recall_score(y_test_saint[i][j], y_pred_labels_saint)
+        auc_saint = roc_auc_score(y_test_saint[i][j], prob_saint[i][j])
+
+        # XGBoost (Tuned, Framingham Only)
+        xgb_cl_tunedF = xgb_classifiers_tuned_rF[i, j]
+        x_test_xgbF = XY_xgb_rF[i, j][1]
+        y_true_xgbF = XY_xgb_rF[i, j][3]
+        y_pred_xgb_tunedF = xgb_cl_tunedF.predict_proba(x_test_xgbF) # XGB test set predictions
+        y_pred_labels_xgbtF = prob_to_labels(y_pred_xgb_tunedF[:,1])
+        acc_xgbtF = accuracy_score(y_true_xgbF, y_pred_labels_xgbtF)
+        prec_xgbtF = precision_score(y_true_xgbF, y_pred_labels_xgbtF)
+        rec_xgbtF = recall_score(y_true_xgbF, y_pred_labels_xgbtF)
+        auc_xgbtF = roc_auc_score(y_true_xgbF, y_pred_xgb_tunedF[:,1])
+
+        # Populate the metric arrays
+        acc[i * models_J + j][:] = [acc_mlp, acc_xgbu, acc_xgbt, acc_saint, acc_xgbtF]
+        prec[i * models_J + j][:] = [prec_mlp, prec_xgbu, prec_xgbt, prec_saint, prec_xgbtF]
+        rec[i * models_J + j][:] = [rec_mlp, rec_xgbu, rec_xgbt, rec_saint, rec_xgbtF]
+        auc[i * models_J + j][:] = [auc_mlp, auc_xgbu, auc_xgbt, auc_saint, auc_xgbtF]
+print("Done.") 
+
+print("Saving all evaluation metrics...")
+np.savetxt("evaluation_metrics/accuracy.csv", acc, delimiter = ",")
+np.savetxt("evaluation_metrics/precision.csv", prec, delimiter = ",")
+np.savetxt("evaluation_metrics/recall.csv", rec, delimiter = ",")
+np.savetxt("evaluation_metrics/auc.csv", auc, delimiter = ",")
 print("Done.")
