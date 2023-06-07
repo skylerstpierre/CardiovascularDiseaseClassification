@@ -24,7 +24,7 @@ The following scripts were modified from the original [Saint repository](https:/
 - `SAINT/train_robust.py`
 - `SAINT/data_openml.py`
 
-Our main adjustments to the SAINT implementation allow the use of custom pickled tabular datasets (with explicit train-val-test splits, and training set oversampling) and to streamline the evaluation pipeline.
+Our main adjustments to the SAINT implementation allow the use of custom pickled tabular datasets (with explicit train-val-test splits, and training set oversampling) and to streamline the evaluation pipeline. The remaining files in the `SAINT` directory have not been modified from the original [Saint repository](https://github.com/somepago/saint).
 
 ## Environment
 We provide an `environment.yml` file for use with `miniconda` or `anaconda`. You can create the environment required for executing the code by running
