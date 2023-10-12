@@ -7,6 +7,8 @@
 We used the UK Biobank data to train sex-specific classifiers of cardiovascular disease. Three different model types were evaluated: MLP (baseline), XGBoost, and SAINT. The SAINT implementation is adapted from the article [SAINT: Improved Neural Networks for Tabular Data via Row Attention and Contrastive Pre-Training](https://arxiv.org/abs/2106.01342) with the corresponding repository: [Saint GitHub](https://github.com/somepago/saint).
 
 We implemented the following scripts:
+- `PopulationCharacteristics.py`
+- `ScatterPlots.py`
 - `CardioPhenoBiobank.py`
 - `CardioPhenoExtract.py`
 - `preprocess_datasets.py`
@@ -41,6 +43,13 @@ We provide the model weights obtained for all 60 trained classifiers:
 - directory `models_XGB` contains trained XGBoost (both untuned and tuned) ensembles
 - directory `models_XGB_Fram` contains XGBoost ensembles trained and tuned on Framingham-score features only
 - directory `bestmodels_saint` contains trained SAINT model weights
+
+
+## Analysis for sex differences in cardiovascular disease diagnosis
+
+`PopulationCharacteristics.py` extracts hypertension, first degree AV block, and dilated and hypertrophic cardiomyopathy information using the Research Analysis Platform integrated with the UK Biobank database.
+
+`ScatterPlots.py` processes the data returned from `PopulationCharacteristics.py` to produce violin and scatter plots of the data. The Teichholz formula is implemented to converted left ventricle end-diastolic volume to diameter measurments.
 
 ## Data preparation
 
