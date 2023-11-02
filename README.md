@@ -49,7 +49,7 @@ We provide the model weights obtained for all 60 trained classifiers:
 
 `PopulationCharacteristics.py` extracts hypertension, first degree AV block, and dilated and hypertrophic cardiomyopathy information using the Research Analysis Platform integrated with the UK Biobank database.
 
-`ScatterPlots.py` processes the data returned from `PopulationCharacteristics.py` to produce violin and scatter plots of the data. The Teichholz formula is implemented to converted left ventricle end-diastolic volume to diameter measurments.
+`ScatterPlots.py` processes the data returned from `PopulationCharacteristics.py` to produce violin and scatter plots of the data. The Teichholz formula is implemented to convert left ventricle end-diastolic volume to diameter measurments.
 
 ## Data preparation
 
